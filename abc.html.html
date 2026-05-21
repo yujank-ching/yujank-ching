@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Between Strings & Sunsets</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;600&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #c8a96e;
+    --rose: #c47b7b;
+    --dusk: #7b6fa0;
+    --sage: #7a9e7e;
+    --ivory: #f5f0e8;
+    --ink: #1a1510;
+    --mist: #b8c4cc;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: #0d0b08;
+    color: var(--ivory);
+    font-family: 'Lato', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, width 0.3s, height 0.3s, opacity 0.3s;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 30px; height: 30px;
+    border: 1px solid rgba(200,169,110,0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: all 0.15s ease;
+  }
+
+  /* Film grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 9990;
+    animation: grain 0.5s steps(1) infinite;
+  }
+
+  @keyframes grain {
+    0%,100% { transform: translate(0,0) }
+    10% { transform: translate(-2%,-3%) }
+    20% { transform: translate(3%,2%) }
+    30% { transform: translate(-1%,4%) }
+    40% { transform: translate(2%,-1%) }
+    50% { transform: translate(-3%,2%) }
+    60% { transform: translate(1%,-2%) }
+    70% { transform: translate(-2%,3%) }
+    80% { transform: translate(3%,-1%) }
+    90% { transform: translate(-1%,2%) }
+  }
+
+  /* ─── TITLE SCREEN ─── */
+  #title-screen {
+    position: fixed;
+    inset: 0;
+    background: #0d0b08;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    transition: opacity 1.5s ease, visibility 1.5s;
+  }
+  #title-screen.fade-out { opacity: 0; visibility: hidden; }
+
+  .title-subtitle {
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.4em;
+    font-size: 0.7rem;
+    color: var(--gold);
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 1s 0.5s forwards;
+  }
+
+  .title-main {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(2.5rem, 8vw, 6rem);
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    text-align: center;
+    line-height: 1.1;
+    margin: 1rem 0;
+    background: linear-gradient(135deg, var(--ivory) 0%, var(--gold) 50%, var(--ivory) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    opacity: 0;
+    animation: fadeUp 1s 1s forwards;
+  }
+
+  .title-ampersand {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.2em;
+  }
+
+  .title-tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    color: var(--mist);
+    opacity: 0;
+    animation: fadeUp 1s 1.5s forwards;
+    margin-bottom: 3rem;
+  }
+
+  .start-btn {
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--ivory);
+    border: 1px solid rgba(200,169,110,0.4);
+    background: transparent;
+    padding: 1rem 2.5rem;
+    cursor: none;
+    opacity: 0;
+    animation: fadeUp 1s 2.2s forwards;
+    transition: all 0.4s;
+    position: relative;
+    overflow: hidden;
+  }
+  .start-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(200,169,110,0.15), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+  }
+  .start-btn:hover::before { transform: translateX(100%); }
+  .start-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* Stars */
+  .stars {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle var(--d) var(--delay) infinite;
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: var(--op); transform: scale(1); }
+    50% { opacity: 0.1; transform: scale(0.5); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── MAIN STORY ─── */
+  #story { opacity: 0; transition: opacity 1s; }
+  #story.visible { opacity: 1; }
+
+  /* ─── SCENE BASE ─── */
+  .scene {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .scene-inner {
+    max-width: 700px;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+  }
+
+  .scene-number {
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    font-size: 0.65rem;
+    letter-spacing: 0.5em;
+    color: var(--gold);
+    opacity: 0.6;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .scene-number::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.4;
+  }
+
+  .scene-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.6rem, 4vw, 2.8rem);
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 2rem;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.9s, transform 0.9s;
+  }
+
+  .scene-body {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.1rem, 2.2vw, 1.35rem);
+    line-height: 1.9;
+    font-weight: 300;
+    color: rgba(245,240,232,0.85);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.9s 0.2s, transform 0.9s 0.2s;
+  }
+
+  .scene-quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
+    font-style: italic;
+    color: var(--gold);
+    border-left: 2px solid var(--gold);
+    padding-left: 1.5rem;
+    margin: 2.5rem 0;
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.9s 0.4s, transform 0.9s 0.4s;
+    line-height: 1.6;
+  }
+
+  .scene-inner.in-view .scene-title,
+  .scene-inner.in-view .scene-body,
+  .scene-inner.in-view .scene-quote {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+
+  /* ─── SCENE BACKGROUNDS ─── */
+
+  /* Scene 1: Summer heat */
+  .scene-1 {
+    background: radial-gradient(ellipse at 70% 30%, #3d1a05 0%, #1a0e04 40%, #0d0b08 100%);
+  }
+  .scene-1 .bg-element {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    animation: pulse 8s ease-in-out infinite;
+  }
+  .scene-1 .sun {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(255,150,30,0.3), rgba(200,80,20,0.1), transparent);
+    top: -100px; right: -50px;
+    animation-delay: 0s;
+  }
+  .scene-1 .heat {
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(180,90,20,0.15), transparent);
+    bottom: 0; left: 10%;
+    animation-delay: -4s;
+  }
+
+  /* Scene 2: Forest arrival */
+  .scene-2 {
+    background: radial-gradient(ellipse at 30% 60%, #0d1f10 0%, #081208 40%, #0d0b08 100%);
+  }
+  .scene-2 .tree-light {
+    position: absolute;
+    width: 2px;
+    background: linear-gradient(to bottom, rgba(150,255,120,0.3), transparent);
+    animation: shimmer var(--d) var(--delay) infinite;
+  }
+
+  /* Scene 3: Sunset jhoola */
+  .scene-3 {
+    background: radial-gradient(ellipse at 50% 20%, #2d1535 0%, #1a0c25 30%, #0d0608 100%);
+  }
+
+  /* Scene 4: Guitar class / Yellow dress */
+  .scene-4 {
+    background: radial-gradient(ellipse at 60% 40%, #1f1510 0%, #110d08 50%, #0d0b08 100%);
+  }
+
+  /* Scene 5: Her presence */
+  .scene-5 {
+    background: radial-gradient(ellipse at 40% 50%, #1f0d0d 0%, #150808 50%, #0d0b08 100%);
+  }
+
+  /* Scene 6: The void (her absence) */
+  .scene-6 {
+    background: #0d0b08;
+  }
+
+  /* Scene 7: The meme / connection */
+  .scene-7 {
+    background: radial-gradient(ellipse at 50% 50%, #0d1520 0%, #08101a 40%, #0d0b08 100%);
+  }
+
+  /* Scene 8: George Everest */
+  .scene-8 {
+    background: radial-gradient(ellipse at 30% 20%, #101828 0%, #080e18 50%, #0d0b08 100%);
+  }
+
+  /* Scene 9: Final / train */
+  .scene-9 {
+    background: radial-gradient(ellipse at 50% 100%, #1a1008 0%, #100c06 30%, #0d0b08 100%);
+    min-height: 120vh;
+  }
+
+  @keyframes pulse {
+    0%,100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  @keyframes shimmer {
+    0%,100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+  }
+
+  /* ─── DIVIDERS ─── */
+  .scene-divider {
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+  }
+  .scene-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+  }
+
+  /* ─── FLOATING PARTICLES ─── */
+  .particle {
+    position: absolute;
+    pointer-events: none;
+    border-radius: 50%;
+    animation: float var(--d) var(--delay) linear infinite;
+  }
+  @keyframes float {
+    0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+    10% { opacity: var(--op); }
+    90% { opacity: var(--op); }
+    100% { transform: translateY(-20px) translateX(var(--drift)); opacity: 0; }
+  }
+
+  /* ─── SPECIAL ELEMENTS ─── */
+  .date-pill {
+    display: inline-block;
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid rgba(200,169,110,0.3);
+    padding: 0.4rem 1rem;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.6s 0.1s;
+  }
+  .scene-inner.in-view .date-pill { opacity: 1; }
+
+  .highlight {
+    color: var(--gold);
+    font-style: italic;
+  }
+
+  .rose-highlight { color: var(--rose); }
+  .sage-highlight { color: var(--sage); }
+  .dusk-highlight { color: #a09acc; }
+
+  /* Guitar strings decoration */
+  .guitar-strings {
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 200px;
+    overflow: hidden;
+    opacity: 0.08;
+    pointer-events: none;
+  }
+  .string-line {
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    animation: vibrate var(--vd) var(--vdelay) ease-in-out infinite;
+  }
+  @keyframes vibrate {
+    0%,100% { transform: scaleX(1); }
+    25% { transform: scaleX(3) translateX(2px); }
+    75% { transform: scaleX(3) translateX(-2px); }
+  }
+
+  /* Message bubble */
+  .message-bubble {
+    display: inline-block;
+    background: rgba(200,169,110,0.12);
+    border: 1px solid rgba(200,169,110,0.25);
+    border-radius: 18px 18px 18px 4px;
+    padding: 1rem 1.5rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-style: italic;
+    color: var(--ivory);
+    margin: 0.5rem 0;
+    max-width: 80%;
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+    transition: opacity 0.5s, transform 0.5s;
+  }
+  .message-bubble.right {
+    background: rgba(122, 158, 126, 0.12);
+    border-color: rgba(122,158,126,0.25);
+    border-radius: 18px 18px 4px 18px;
+    margin-left: auto;
+  }
+  .scene-inner.in-view .message-bubble { opacity: 1; transform: translateY(0) scale(1); }
+  .message-bubble:nth-child(2) { transition-delay: 0.2s; }
+  .message-bubble:nth-child(3) { transition-delay: 0.4s; }
+  .message-bubble:nth-child(4) { transition-delay: 0.6s; }
+
+  .messages-wrapper {
+    margin-top: 2rem;
+  }
+
+  /* Final scene styling */
+  .final-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(2rem, 6vw, 4.5rem);
+    text-align: center;
+    background: linear-gradient(135deg, var(--gold), var(--rose), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 1.2s, transform 1.2s;
+    line-height: 1.3;
+  }
+  .scene-inner.in-view .final-title { opacity: 1; transform: translateY(0); }
+
+  .final-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    text-align: center;
+    color: rgba(245,240,232,0.6);
+    margin-top: 1.5rem;
+    opacity: 0;
+    transition: opacity 1s 0.6s;
+  }
+  .scene-inner.in-view .final-sub { opacity: 1; }
+
+  .heart-beat {
+    display: inline-block;
+    animation: heartbeat 1.5s ease-in-out infinite;
+    color: var(--rose);
+  }
+  @keyframes heartbeat {
+    0%,100% { transform: scale(1); }
+    15% { transform: scale(1.25); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.15); }
+    60% { transform: scale(1); }
+  }
+
+  /* Progress line */
+  .progress-line {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--rose), var(--gold));
+    z-index: 1000;
+    transition: width 0.1s;
+    box-shadow: 0 0 8px rgba(200,169,110,0.5);
+  }
+
+  /* Chapter markers */
+  .chapter-markers {
+    position: fixed;
+    right: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    z-index: 500;
+  }
+  .chapter-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    border: 1px solid rgba(200,169,110,0.4);
+    background: transparent;
+    cursor: none;
+    transition: all 0.3s;
+    position: relative;
+  }
+  .chapter-dot.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    box-shadow: 0 0 6px var(--gold);
+  }
+  .chapter-dot:hover { transform: scale(1.5); }
+
+  /* Mist/fog layers */
+  .mist-layer {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 200px;
+    background: linear-gradient(to top, rgba(13,11,8,0.8), transparent);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Bird silhouette */
+  .bird-container {
+    position: absolute;
+    top: 15%;
+    right: 10%;
+    opacity: 0.15;
+  }
+  .bird-svg { animation: soar 20s ease-in-out infinite; }
+  @keyframes soar {
+    0%,100% { transform: translate(0,0) rotate(0deg); }
+    25% { transform: translate(-30px,-15px) rotate(-5deg); }
+    50% { transform: translate(-60px,5px) rotate(3deg); }
+    75% { transform: translate(-30px,10px) rotate(-2deg); }
+  }
+
+  /* Ghazal verse */
+  .ghazal-verse {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    text-align: center;
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    color: rgba(200,169,110,0.7);
+    padding: 3rem 2rem;
+    border-top: 1px solid rgba(200,169,110,0.1);
+    border-bottom: 1px solid rgba(200,169,110,0.1);
+    margin: 2rem 0;
+    line-height: 2;
+    opacity: 0;
+    transition: opacity 1s 0.3s;
+  }
+  .scene-inner.in-view .ghazal-verse { opacity: 1; }
+
+  /* Yellow dress indicator */
+  .yellow-dress {
+    display: inline-block;
+    width: 14px; height: 14px;
+    background: #f5d76e;
+    border-radius: 50%;
+    box-shadow: 0 0 12px #f5d76e;
+    vertical-align: middle;
+    margin: 0 0.3rem;
+    animation: glow 2s ease-in-out infinite;
+  }
+  .red-shirt {
+    display: inline-block;
+    width: 14px; height: 14px;
+    background: var(--rose);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--rose);
+    vertical-align: middle;
+    margin: 0 0.3rem;
+    animation: glow 2s ease-in-out infinite;
+  }
+  @keyframes glow {
+    0%,100% { box-shadow: 0 0 8px currentColor; transform: scale(1); }
+    50% { box-shadow: 0 0 16px currentColor; transform: scale(1.15); }
+  }
+
+  /* Scroll hint */
+  .scroll-hint {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 1;
+    transition: opacity 0.5s;
+    z-index: 200;
+  }
+  .scroll-hint.hidden { opacity: 0; pointer-events: none; }
+  .scroll-hint span {
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(200,169,110,0.5);
+  }
+  .scroll-arrow {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, rgba(200,169,110,0.5), transparent);
+    animation: scrollBounce 2s ease-in-out infinite;
+  }
+  @keyframes scrollBounce {
+    0%,100% { transform: scaleY(1); opacity: 0.5; }
+    50% { transform: scaleY(1.5); opacity: 1; }
+  }
+
+  /* Cloud animation */
+  .clouds {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .cloud {
+    position: absolute;
+    border-radius: 50px;
+    filter: blur(30px);
+    animation: drift var(--d) var(--delay) ease-in-out infinite alternate;
+  }
+  @keyframes drift {
+    from { transform: translateX(-20px); }
+    to { transform: translateX(20px); }
+  }
+
+  /* End credits */
+  .end-credits {
+    text-align: center;
+    padding: 4rem 2rem;
+    border-top: 1px solid rgba(200,169,110,0.1);
+    margin-top: 4rem;
+  }
+  .end-credits p {
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(200,169,110,0.3);
+    margin: 0.5rem 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="progress-line" id="progressLine"></div>
+
+<!-- TITLE SCREEN -->
+<div id="title-screen">
+  <div class="stars" id="starsContainer"></div>
+  <div class="title-subtitle">A Summer Story</div>
+  <h1 class="title-main">Between Strings<br><span class="title-ampersand">&</span> Sunsets</h1>
+  <p class="title-tagline">Of ghazals, glances, and a girl in yellow</p>
+  <button class="start-btn" id="startBtn">Begin the Story</button>
+</div>
+
+<!-- SCROLL HINT -->
+<div class="scroll-hint" id="scrollHint">
+  <span>Scroll to unfold</span>
+  <div class="scroll-arrow"></div>
+</div>
+
+<!-- CHAPTER MARKERS -->
+<div class="chapter-markers" id="chapterMarkers"></div>
+
+<!-- MAIN STORY -->
+<div id="story">
+
+  <!-- SCENE 1: Summer Arrives -->
+  <section class="scene scene-1" id="scene-1">
+    <div class="bg-element sun"></div>
+    <div class="bg-element heat"></div>
+    <div class="mist-layer"></div>
+    <div class="scene-inner">
+      <div class="scene-number">Act I</div>
+      <div class="date-pill">June 2023 · RGIPT</div>
+      <h2 class="scene-title">The Last Summer</h2>
+      <p class="scene-body">
+        The summer in RGIPT was <span class="highlight">blistering, monotonous, and seemingly never-ending</span>. 
+        I was acutely aware that this was my last summer in college. But little did I know—
+        this final summer would mark the beginning of something <span class="rose-highlight">unforgettable</span>.
+      </p>
+      <blockquote class="scene-quote">
+        "I had never experienced isolation in such a beautiful way."
+      </blockquote>
+      <p class="scene-body">
+        I was set to leave for CSIR-IIP—an industrial research organization nestled at the edge of 
+        <span class="sage-highlight">Rajaji National Park</span>. Where the vast expanse of wilderness 
+        seamlessly blended with the city's edges. Towering mountains loomed in the distance, 
+        and dense greenery exhaled a quiet serenity.
+      </p>
+    </div>
+  </section>
+
+  <div class="scene-divider"></div>
+
+  <!-- SCENE 2: The Forest -->
+  <section class="scene scene-2" id="scene-2">
+    <div class="guitar-strings">
+      <div class="string-line" style="left:15%;--vd:2.1s;--vdelay:0s;"></div>
+      <div class="string-line" style="left:30%;--vd:1.8s;--vdelay:0.3s;"></div>
+      <div class="string-line" style="left:50%;--vd:2.4s;--vdelay:0.1s;"></div>
+      <div class="string-line" style="left:70%;--vd:1.6s;--vdelay:0.5s;"></div>
+      <div class="string-line" style="left:85%;--vd:2.2s;--vdelay:0.2s;"></div>
+    </div>
+    <div class="mist-layer"></div>
+    <div class="scene-inner">
+      <div class="scene-number">Act II</div>
+      <h2 class="scene-title">Deep in the Forest</h2>
+      <p class="scene-body">
+        The hostel stood deep inside the forest—a kilometre from the lab. 
+        At first, the remoteness seemed daunting, but soon I began to <span class="sage-highlight">revel in it</span>. 
+        The distance gave me time to reflect. To grow.
+      </p>
+      <p class="scene-body" style="margin-top:1.5rem;">
+        I made new friends. Cultivated new hobbies. And began writing my thoughts on a swinging 
+        <span class="highlight">jhoola</span> near my room. Every evening, I watched the sunset—
+        pink-tinged clouds drifting lazily, a lone bird perched atop the highest branch.
+      </p>
+      <div class="ghazal-verse">
+        "They weren't just images; they were feelings."<br>
+        <span style="font-size:0.85em; opacity:0.6;">I even started listening to ghazals.</span>
+      </div>
+    </div>
+    <div class="bird-container">
+      <svg class="bird-svg" width="60" height="30" viewBox="0 0 60 30" fill="none">
+        <path d="M30 15 Q20 5 5 10 Q15 15 30 15 Q45 15 55 10 Q40 5 30 15Z" fill="rgba(245,240,232,0.6)"/>
+      </svg>
+    </div>
+  </section>
+
+  <div class="scene-divider"></div>
+
+  <!-- SCENE 3: Guitar & The First Glimpse -->
+  <section class="scene scene-3" id="scene-3">
+    <div class="clouds">
+      <div class="cloud" style="width:300px;height:80px;background:rgba(100,60,140,0.3);top:10%;left:60%;--d:6s;--delay:0s;"></div>
+      <div class="cloud" style="width:200px;height:60px;background:rgba(180,80,100,0.2);top:20%;left:20%;--d:8s;--delay:-3s;"></div>
+    </div>
+    <div class="mist-layer"></div>
+    <div class="scene-inner">
+      <div class="scene-number">Act III</div>
+      <div class="date-pill">23rd June · Guitar Class</div>
+      <h2 class="scene-title">A Girl in Yellow</h2>
+      <p class="scene-body">
+        One of my longtime passions had been music, so I decided to join a guitar class. 
+        My guitar had been lying untouched since college—it felt like the perfect time to reconnect.
+      </p>
+      <p class="scene-body" style="margin-top:1.5rem;">
+        I cycled 1.5 kilometres, following Google Maps. Asked about the fees and schedule. 
+        Rewarded myself with a plate of the famous steamed momos from a nearby stall.
+      </p>
+      <blockquote class="scene-quote">
+        Amidst all this, I noticed someone—<span class="yellow-dress"></span> a girl in a yellow dress—
+        but I looked away, unwilling to invite unnecessary distractions into my peaceful world.
+      </blockquote>
+    </div>
+  </section>
+
+  <div class="scene-divider"></div>
+
+  <!-- SCENE 4: The First Class -->
+  <section class="scene scene-4" id="scene-4">
+    <div class="guitar-strings">
+      <div class="string-line" style="left:10%;--vd:1.9s;--vdelay:0s;"></div>
+      <div class="string-line" style="left:25%;--vd:2.3s;--vdelay:0.4s;"></div>
+      <div class="string-line" style="left:40%;--vd:1.7s;--vdelay:0.2s;"></div>
+      <div class="string-line" style="left:60%;--vd:2.1s;--vdelay:0.6s;"></div>
+      <div class="string-line" style="left:75%;--vd:1.5s;--vdelay:0.1s;"></div>
+      <div class="string-line" style="left:90%;--vd:2.4s;--vdelay:0.3s;"></div>
+    </div>
+    <div class="mist-layer"></div>
+    <div class="scene-inner">
+      <div class="scene-number">Act IV</div>
+      <h2 class="scene-title">The First Class</h2>
+      <p class="scene-body">
+        I still remember my first class vividly—how I was asked about my knowledge of music, 
+        my hobbies, my dedication. But what stood out most wasn't the lesson.
+      </p>
+      <p class="scene-body" style="margin-top: 1.5rem;">
+        It was <span class="rose-highlight">her</span>. The girl in yellow from before, 
+        now dressed in a <span class="red-shirt"></span> red t-shirt. She was beautiful, 
+        yet in a way that wasn't intimidating. Her innocence made her glow, and her laughter 
+        filled the room with light.
+      </p>
+      <blockquote class="scene-quote">
+        "Her red cheeks deepened like rose petals rubbed between fingers. 
+        She played the guitar with childlike enthusiasm, her joy contagious."
+      </blockquote>
+      <p class="scene-body">
+        Though I was introduced to everyone in the class, I couldn't muster the courage 
+        to ask her name. Instead, I stole glances—<span class="highlight">subtle, fleeting.</span>
+      </p>
+    </div>
+  </section>
+
+  <div class="scene-divider"></div>
+
+  <!-- SCENE 5: The Routine -->
+  <section class="scene scene-5" id="scene-5">
+    <div class="mist-layer"></div>
+    <div class="scene-inner">
+      <div class="scene-number">Act V</div>
+      <h2 class="scene-title">Three Months of Silence</h2>
+      <p class="scene-body">
+        This became my routine for <span class="highlight">three months</span>. 
+        Lab by 9:30 AM. Guitar class by 5:45 PM. And the terrifying ride back—
+        pitch black and lonely, pedaling fast, haunted by stories of 
+        <span class="sage-highlight">tigers, elephants, and snakes</span> narrated by the hostel guard.
+      </p>
+      <p class="scene-body" style="margin-top:1.5rem;">
+        Earphones in. Ghazals playing. Eyes admiring the clouds.
+      </p>
+      <div class="ghazal-verse">
+        "For the first time in years, I wasn't chasing anything or anyone.<br>
+        I was simply living."
+      </div>
+    </div>
+  </section>
+
+  <div class="scene-divider"></div>
+
+  <!-- SCENE 6: The Void -->
+  <section class="scene scene-6" id="scene-6">
+    <div class="scene-inner">
+      <div class="scene-number">Act VI</div>
+      <div class="date-pill">August · 15 Days of Absence</div>
+      <h2 class="scene-title">The Strange Void</h2>
+      <p class="scene-body">
+        Then August arrived. For <span class="highlight">fifteen days</span>, she stopped coming to class. 
+        I felt a strange void, a boredom I couldn't explain. 
+        Maybe I had grown used to her presence.
+      </p>
+      <blockquote class="scene-quote">
+        But then, she returned. And suddenly, the light was back.
+      </blockquote>
+      <p class="scene-body">
+        I wanted to talk to her, but hesitation held me back. 
+        I had no excuse. No pretext. Days passed. 
+        The guitar strings hummed. The sunsets painted their stories. 
+        And still—<span class="rose-highlight">silence.</span>
+      </p>
+    </div>
+  </section>
+
+  <div class="scene-divider"></div>
+
+  <!-- SCENE 7: The Meme -->
+  <section class="scene scene-7" id="scene-7">
+    <div class="clouds">
+      <div class="cloud" style="width:250px;height:60px;background:rgba(30,70,130,0.2);top:15%;right:10%;--d:7s;--delay:0s;"></div>
+    </div>
+    <div class="mist-layer"></div>
+    <div class="scene-inner">
+      <div class="scene-number">Act VII</div>
+      <div class="date-pill">4th September · A Small Gesture</div>
+      <h2 class="scene-title">The Beginning</h2>
+      <p class="scene-body">
+        On the 4th of September, I did the simplest thing—
+        <span class="highlight">I sent a meme about guitars.</span>
+      </p>
+      <p class="scene-body" style="margin-top:1rem;">She reacted to it. I assumed that was it.</p>
+      <p class="scene-body" style="margin-top:0.5rem; font-style:italic; color:var(--gold);">But it wasn't.</p>
+      <p class="scene-body" style="margin-top:1.5rem;">
+        Then—unexpectedly—the next morning: <span class="sage-highlight">she sent me a meme.</span><br>
+        A small gesture. But to me, it was everything.
+      </p>
+      <div class="messages-wrapper">
+        <div class="message-bubble">🎸 *meme about guitar chords*</div>
+        <div class="message-bubble right">haha 😄 *another guitar meme*</div>
+        <div class="message-bubble">so... do you write too?</div>
+        <div class="message-bubble right">yes — poetry, mostly. want to read?</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="scene-divider"></div>
+
+  <!-- SCENE 8: George Everest -->
+  <section class="scene scene-8" id="scene-8">
+    <div class="clouds">
+      <div class="cloud" style="width:400px;height:100px;background:rgba(20,40,80,0.35);top:5%;left:20%;--d:10s;--delay:-2s;"></div>
+      <div class="cloud" style="width:300px;height:70px;background:rgba(30,50,100,0.2);top:25%;right:5%;--d:8s;--delay:-5s;"></div>
+    </div>
+    <div class="mist-layer"></div>
+    <div class="scene-inner">
+      <div class="scene-number">Act VIII</div>
+      <div class="date-pill">8th September · Cloud End Point</div>
+      <h2 class="scene-title">A Thousand Feet Above</h2>
+      <p class="scene-body">
+        I visited <span class="highlight">George Everest</span>—a place 1,000 feet above sea level. 
+        I stood at Cloud End Point, feeling the mist against my skin, 
+        inhaling the cold, crisp air.
+      </p>
+      <blockquote class="scene-quote">
+        It was a good day. And the next morning, 
+        I found a message in my inbox.
+      </blockquote>
+      <p class="scene-body">
+        Our conversation started casually—centered around guitar classes. 
+        A few messages. Nothing extraordinary on the surface.<br><br>
+        But something was shifting.
+      </p>
+    </div>
+  </section>
+
+  <div class="scene-divider"></div>
+
+  <!-- SCENE 9: The Train / Finale -->
+  <section class="scene scene-9" id="scene-9">
+    <div class="clouds">
+      <div class="cloud" style="width:500px;height:120px;background:rgba(100,60,20,0.2);top:5%;left:10%;--d:12s;--delay:0s;"></div>
+      <div class="cloud" style="width:300px;height:80px;background:rgba(150,80,40,0.15);top:15%;right:0;--d:9s;--delay:-4s;"></div>
+    </div>
+    <div class="mist-layer"></div>
+    <div class="scene-inner">
+      <div class="scene-number">Epilogue</div>
+      <div class="date-pill">16th September · The Last Train</div>
+      <h2 class="scene-title">I'm Leaving. Hope Our Paths Cross Again.</h2>
+      <p class="scene-body">
+        As I boarded my train back home on the 16th of September, 
+        I sent her one last message:
+      </p>
+      <blockquote class="scene-quote">
+        "I'm leaving. Hope our paths cross again."
+      </blockquote>
+      <p class="scene-body">
+        Maybe it was fate, or maybe it was that message—but something changed. 
+        Even after leaving, we kept talking. We shared more. 
+        About <span class="highlight">music, literature, poetry</span>.
+      </p>
+      <p class="scene-body" style="margin-top:1.5rem;">
+        I sent her paradoxical thoughts, memes about ghazals. 
+        She responded with her writings—<span class="rose-highlight">beautiful, imaginative, deep</span>. 
+        I was awestruck by her mind, her creativity.
+      </p>
+      <p class="scene-body" style="margin-top:1.5rem;">
+        And in those words, I found a connection I never expected.
+      </p>
+
+      <div style="margin-top:4rem; text-align:center;">
+        <div class="final-title">
+          What started as fleeting glances<br>
+          <span style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:0.7em;">turned into something</span><br>
+          Real. Lasting.
+        </div>
+        <p class="final-sub">
+          And so, our conversations continue—<br>
+          till today, and hopefully, <span class="heart-beat">♡</span> forever.
+        </p>
+      </div>
+
+      <div class="end-credits">
+        <p>Between Strings & Sunsets</p>
+        <p style="margin-top:0.8rem; letter-spacing:0.15em; color:rgba(200,169,110,0.2);">A true story · Summer 2024 · Dehradun</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // ─── Stars ───
+  const starsContainer = document.getElementById('starsContainer');
+  for (let i = 0; i < 120; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2 + 0.5;
+    s.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}%; top:${Math.random()*100}%;
+      --op:${Math.random()*0.7+0.1};
+      --d:${Math.random()*4+2}s;
+      --delay:-${Math.random()*4}s;
+      animation-name: twinkle;
+    `;
+    starsContainer.appendChild(s);
+  }
+
+  // ─── Cursor ───
+  const cursor = document.getElementById('cursor');
+  const cursorRing = document.getElementById('cursorRing');
+  let mx = -100, my = -100, rx = -100, ry = -100;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  (function animCursor() {
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    cursorRing.style.left = rx + 'px';
+    cursorRing.style.top = ry + 'px';
+    requestAnimationFrame(animCursor);
+  })();
+
+  // ─── Start button ───
+  document.getElementById('startBtn').addEventListener('click', () => {
+    const ts = document.getElementById('title-screen');
+    const story = document.getElementById('story');
+    ts.classList.add('fade-out');
+    setTimeout(() => {
+      ts.style.display = 'none';
+      story.classList.add('visible');
+    }, 1500);
+  });
+
+  // ─── Chapter markers ───
+  const scenes = document.querySelectorAll('.scene');
+  const markersEl = document.getElementById('chapterMarkers');
+  scenes.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'chapter-dot';
+    dot.addEventListener('click', () => scenes[i].scrollIntoView({behavior:'smooth'}));
+    markersEl.appendChild(dot);
+  });
+
+  // ─── Scroll logic ───
+  const progressLine = document.getElementById('progressLine');
+  const scrollHint = document.getElementById('scrollHint');
+  const dots = document.querySelectorAll('.chapter-dot');
+  let scrolled = false;
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.querySelector('.scene-inner').classList.add('in-view');
+        const idx = [...scenes].indexOf(entry.target);
+        dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+      }
+    });
+  }, { threshold: 0.3 });
+
+  scenes.forEach(s => observer.observe(s));
+
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.body.scrollHeight - window.innerHeight;
+    progressLine.style.width = (scrollTop / docHeight * 100) + '%';
+
+    if (!scrolled && scrollTop > 100) {
+      scrolled = true;
+      scrollHint.classList.add('hidden');
+    }
+
+    // Floating particles (rare)
+    if (Math.random() < 0.05) createParticle();
+  });
+
+  // ─── Particles ───
+  function createParticle() {
+    const scene = scenes[Math.floor(Math.random() * scenes.length)];
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 3 + 1;
+    const colors = ['rgba(200,169,110,', 'rgba(196,123,123,', 'rgba(122,158,126,'];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    p.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}%;
+      background:${color}0.6)};
+      --d:${Math.random()*8+5}s;
+      --delay:-${Math.random()*5}s;
+      --op:${Math.random()*0.4+0.1};
+      --drift:${(Math.random()-0.5)*100}px;
+    `;
+    scene.appendChild(p);
+    setTimeout(() => p.remove(), 13000);
+  }
+
+  // Initial particles
+  for (let i = 0; i < 8; i++) setTimeout(createParticle, i * 400);
+</script>
+
+</body>
+</html>
